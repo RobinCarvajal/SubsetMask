@@ -32,7 +32,5 @@ Seurat >= 4.3.0
 Python >= 3.0
 OpenCV (python) >= 4.11.0
 
-Other dependencies: sp, imager, tidyverse (list any others you use)
-
-License
+# License
 This project is currently unlicensed. All rights reserved.
