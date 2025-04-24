@@ -1,0 +1,519 @@
+---
+title: "Tutorial"
+output: 
+  html_document: 
+    toc: true
+---
+
+# SubsetMask tutorial vignette
+
+## 1. Exporting Images
+
+Loading object
+
+```{r}
+brain <- readRDS(file.path(objects_dir,"brain_objects",
+                           "05_11_2024_brain_v1.5_broad.labels_added.RDS"))
+```
+
+Create an output dir for the PNGs
+
+```{r}
+segmentation_plots_dir <- file.path(data_dir, "regional", "spatial_segmentation_plots")
+
+# Create the directory if they do not already exist
+if (!dir.exists(segmentation_plots_dir)) {dir.create(segmentation_plots_dir, recursive = TRUE)}
+```
+
+Generate a list of spatial fov images
+
+```{r}
+fov_list <- names(brain@images)
+```
+
+Generate all the images PNGs in a loop and export them
+
+```{r}
+
+for (fov in fov_list){
+  
+  plot <- ImageDimPlot(object = brain, 
+                       fov = fov, 
+                       boundaries = "segmentation", 
+                       group.by = "broad.labels", 
+                       border.size = 0.01,
+                       border.color = "black",
+                       flip_xy = F)+
+    scale_y_continuous(expand = c(0,0)) +
+    scale_x_continuous(expand = c(0,0))+
+    theme_void() +
+    NoLegend()
+  
+  # create a dir per fov
+  #fov_dir <- file.path(segmentation_plots_dir, fov)
+  fov_dir <- segmentation_plots_dir
+  if (!dir.exists(fov_dir)) {dir.create(fov_dir, recursive = TRUE)}
+  
+  # save the plot
+  ggsave(plot =  plot, 
+         filename = file.path(fov_dir, paste0(fov,".png")),
+         w=3400, h=4250, units = "px", 
+         dpi=300, bg = "white")
+  
+  # indicate when finished
+  print(paste0(fov, " Finished "))
+}
+
+```
+
+## 2. Export image dimensions
+
+Extract metadata
+
+```{r}
+brain.meta <- brain@meta.data %>% 
+  select(x_slide_mm, y_slide_mm, sample_name)
+```
+
+Extract image dimensions
+
+```{r}
+image_dimensions <- brain.meta %>%
+  # Filter rows in brain.meta that are in fov_list
+  filter(sample_name %in% fov_list) %>% 
+  group_by(sample_name) %>%
+  #calculate min and max values and summarise
+  summarize(
+    x_min = min(x_slide_mm, na.rm = TRUE),
+    x_max = max(x_slide_mm, na.rm = TRUE),
+    y_min = min(y_slide_mm, na.rm = TRUE),
+    y_max = max(y_slide_mm, na.rm = TRUE)
+  ) %>%
+  # change column sample_name to sample
+  rename(sample = sample_name) %>%
+  ungroup()%>%
+  # transforming to df
+  as.data.frame()
+
+print(image_dimensions)
+```
+
+Export as csv
+
+```{r}
+write.csv(image_dimensions, file.path(data_dir, "regional", "image_dimensions.csv"), row.names = FALSE)
+```
+
+## 3. Creating folders for the masks
+
+Its important to create a folder per PNG to store each mask
+
+```{r}
+for (fov in fov_list){
+  
+  # create a dir per fov
+  mask_dir <- file.path(data_dir,"regional", "spatial_segmentation_masks")
+  fov_dir <- file.path(mask_dir, fov)
+  if (!dir.exists(fov_dir)) {dir.create(fov_dir, recursive = TRUE)}
+
+  
+  # indicate when finished
+  print(paste0(fov, " Finished "))
+}
+```
+
+## 4. Draw the masks
+
+Important Notes:
+
+-   Whichever name you choose for the mask(s). make sure its meaningful, as this name will be used to name the mask coordinate files.
+
+-   Save the masks within the structure that was created in Step 3.
+
+-   The name structure needs to be: `sample_name-region_of_interest-coords`. Example: `s1056ant_bs4-nucleus_accumbens-coords`
+
+## 5. Get mask coordinates (in Python)
+
+To get the mask coordinates we need the `image_dimensions.csv`, `PNG` images and the `masks`
+
+Import libraries
+
+```{python}
+import cv2
+import csv
+import pandas as pd
+from pathlib import Path
+import os
+```
+
+Function to get the masks - `get_mask_coord`
+
+```{python}
+def get_mask_coord(mask_path, x_min, x_max, y_min, y_max, out):
+
+    # Load the black-and-white image
+    mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+
+    # Get the original image dimensions
+    height, width = mask.shape
+
+    # Calculate scaling factors based on the target ranges
+    scale_x = (x_max - x_min) / width
+    scale_y = (y_max - y_min) / height
+
+    # Apply binary inverse thresholding to select black regions
+    _, binary = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY_INV)
+
+    # Find contours in the black regions
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Open a CSV file to write
+    with open(out, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Write the header row with 'x' and 'y'
+        writer.writerow(['x', 'y'])
+        
+        # Extract, scale, and write the transformed coordinates of the contours
+        for contour in contours:
+            for point in contour:
+                # Original coordinates (mask space)
+                x, y = point[0]
+                
+                # Scale the x and y coordinates to the target range
+                x_transformed = x * scale_x + x_min
+                # Correct the y-axis (invert the y-coordinate system)
+                y_transformed = y_max - (y * scale_y )
+                
+                # Write the transformed coordinates to the CSV
+                writer.writerow([f"{x_transformed:.4f}", f"{y_transformed:.2f}"])
+
+    print(f"Coordinates have been saved to {out}")
+
+    return None
+```
+
+Load the image dimesions table
+
+```{python}
+# regional path
+regional_path = "F:/cosmx_data/regional"
+
+# load dimentions csv
+dims_table = pd.read_csv(Path(regional_path)/"image_dimensions.csv")
+dims_table = dims_table.set_index("sample")
+```
+
+Check the table
+
+```{python}
+print(dims_table)
+```
+
+Use the folder structure created before to get the sample names
+
+```{python}
+samples = os.listdir(Path(regional_path) / "spatial_segmentation_masks")
+```
+
+Create a mask directories dictionary
+
+```{python}
+
+mask_dirs = {}
+
+# loop
+for sample in samples:
+    # List files in the directory
+    sample_masks = Path(regional_path) / "spatial_segmentation_masks" / sample
+    files = os.listdir(sample_masks)
+    
+    # Create a list to hold filtered files
+    filtered_files = []
+    
+    # Loop through the files and add those that don't start with "._" (hidden files)
+    for file in files:
+        if not file.startswith("._"):
+            filtered_files.append(file)
+    
+    # Assign the filtered files to the dictionary
+    mask_dirs[sample] = filtered_files
+
+```
+
+Check the dictionary
+
+```{python}
+print(mask_dirs)
+```
+
+Main processing loop
+
+```{python}
+
+for sample, mask_list in mask_dirs.items():
+    for mask in mask_list:
+        print(mask)
+
+        mask_path = Path(regional_path) / "spatial_segmentation_masks" / sample/ mask
+
+        print(mask_path)
+
+        out_dir = f"{regional_path}/segmentation_mask_coords/{sample}"
+        os.makedirs(out_dir, exist_ok=True)
+
+        print(out_dir)
+        
+        # remove png from the mask name
+        mask_noext = os.path.splitext(mask)[0]
+        print(mask_noext)
+        
+        get_mask_coord(
+
+            mask_path=mask_path,
+            x_min=dims_table.loc[sample]["x_min"],
+            x_max=dims_table.loc[sample]["x_max"],
+            y_min=dims_table.loc[sample]["y_min"],
+            y_max=dims_table.loc[sample]["y_max"],
+            out=f"{out_dir}/{mask_noext}_coords.csv"
+
+        )
+```
+
+## 6. Subset the Seurat Object based on the mask coordinates
+
+### 6.1. Make SpatialPolygons objects with the coordinates
+
+Load all the mask coordinates in a list
+```{r}
+# list the samples that actually have masks (not all of them might have)
+samples <- list.files(file.path(data_dir,"regional","segmentation_mask_coords"),
+                      full.names = F, recursive = F)
+
+```
+
+Convert the mask coordinates to `SpatialPolygons` objects and store them in a list
+```{r}
+# create an empty list to store the polygon objects
+mask.polygons_list <- list()
+
+# loop to add all polygons to its object
+for (sample in samples){
+  
+  # extracting all the paths of the mask coordinates files
+  mask_list <- list.files(file.path(data_dir,"regional","segmentation_mask_coords",sample),
+                          full.names = T, recursive = F)
+  
+  # loop to add all the mask coordinates to its sample and create the polygon object
+  for (mask in mask_list){
+    
+    # name
+    mask_name <- file_path_sans_ext(basename(mask))
+    # path
+    mask_path <- mask
+    
+    # read the mask coordinates
+    mask_df <- read.csv(mask_path)
+    
+    # Create the SpatialPolygons object using the coordinates
+    coords <- as.matrix(mask_df)
+    polygon <- Polygon(coords)
+    spatial_polygon <- Polygons(list(polygon), ID = mask_name)
+    spatial_polygon_object <- SpatialPolygons(list(spatial_polygon))
+  
+  # assigning the polygon object to the mask.polygons list
+    mask.polygons_list[[sample]][[mask_name]] <- spatial_polygon_object
+  
+  }
+  
+}
+```
+
+Example of visualisation of the polygons
+```{r}
+example_sample <- "s1056ant_bs4"
+example_mask <- "s1056ant_bs4-nucleus_accumbens_coords"
+example_polygon <- mask.polygons_list[[example_sample]][[example_mask]]
+plot(example_polygon, col = "lightblue", border = "black")
+```
+
+### 6.2. Transform the original samples to SpatialPoints
+
+Load the object again if necessary(not done here)
+
+We use the coordinates in the metadata or centroids coordiantes to build SpatialPoints objects
+```{r}
+# empty list to add SpatialPoints object per sample
+brain_spatial.points_list <- list()
+
+# loop to add the spatial objects based on brain coords 
+for (sample in samples){
+  
+  brain_spatial.points_list[[sample]] <- brain.metadata %>%
+    filter(sample_name == sample) %>%
+    select(x_slide_mm, y_slide_mm) %>%
+    as.matrix() %>%
+    SpatialPoints()
+}
+```
+
+# example of SpatialPoints object
+```{r}
+plot(brain_spatial.points_list[["s1055ant_bs2"]])
+```
+
+### 6.3. Overlap SpatialPoints with SpatialPolygons for each mask
+
+Checking if the SpatialPoints object (original object) are inside the SpatialPolygons object (mask object)
+```{r}
+
+# empty list to store the points inside the region masks
+region.points_list <- list()
+
+# loop to check if the points are inside the polygon
+for (sample in samples){
+  
+  # sample spatial points
+  points <- brain_spatial.points_list[[sample]]
+  
+  for (mask_name in names(mask.polygons_list[[sample]])){
+    
+    mask <- mask.polygons_list[[sample]][[mask_name]]
+    
+    inside_polygon <- !is.na(over(points, mask))
+    inside_polygon_df <- data.frame(inside_polygon)
+    names(inside_polygon_df)[1] <- "inside"
+    
+    # Get the row names of points that are inside the polygon
+    inside_polygon_cells <- row.names(subset(inside_polygon_df, inside == TRUE))
+    
+
+    # remove "coords" from the mask_name
+    mask_name <- gsub("-coords", "", mask_name)
+    
+    # removed the sample name from the inside_points object lists 
+    # i.e. "agranular_insula" instead of "s1055ant_bs1-agranular_insula"
+    # remove the sample name from the mask name (DID IT)
+    mask_name <- gsub(paste0(sample,"-"), "", mask_name)
+    
+    region.points_list[[sample]][[mask_name]] <- inside_polygon_cells
+    
+  }
+  
+}
+
+```
+
+Example of visualisation
+```{r}
+example_cells <- region.points_list[["s1055ant_bs1"]][["caudoputamen"]]
+example_subset <- subset(brain, cells =  example_cells)# subset from the brain object
+example_spatial.plot <- ImageDimPlot(example_subset, boundaries = "segmentation", coord.fixed = T, flip_xy = F)
+```
+
+Save the list of cells as an object
+```{r}
+saveRDS(region.points_list, file.path(data_dir,"regional",
+                                 "final_region.points.RDS"))
+```
+
+[OPTIONAL] Check the results 
+```{r}
+
+# Create an empty data frame
+df <- data.frame()
+
+# Iterate through each sample in the list
+for (sample in names(region.points_list)) {
+  print(" ")
+  print(sample)
+  
+  # Get all regions as a single string separated by "/"
+  all_regions <- paste(names(region.points_list[[sample]]), collapse = "/")
+  
+  # Create a data frame line with sample and combined regions
+  df_line <- data.frame(sample = sample, 
+                        regions = all_regions)
+  
+  # Add df_line to df
+  df <- rbind(df, df_line)
+}
+
+# View the resulting data frame
+print(df)
+
+# save as a txt file 
+write.csv(df, file.path(data_dir,"regional",
+                        "2025_01_21_region_points_summary.csv"))
+
+```
+
+## 7. Assign the region labels to the original Seurat object
+
+Load the Seurat object, region.points_list and extract the metadata
+```{r}
+# Load the brain object with annotated regions
+brain <- readRDS(file.path(objects_dir,"brain_objects","2024_11_22_brain_v1.6_fine.labels_added.RDS"))
+# load the region points
+region.points_list <- readRDS( file.path(data_dir,"regional","final_region.points.RDS"))
+# create a metadata object
+metadata <- brain@meta.data
+
+```
+
+Add labels to the metadata
+```{r}
+
+# create a column in the metadata object to store the region labels and set "not assigned" by default
+metadata$regions <- "not_assigned"
+
+# sample names inside the region.points_list
+sample_names <- names(region.points_list)
+
+# get all the names/barcodes of cells from the metadata
+all_cells <- rownames(metadata) 
+
+# main processing loop
+for (sample in sample_names){
+  
+  sample.region_points <- region.points_list[[sample]]
+  
+  region_names <- names(sample.region_points)
+  
+  for (region in region_names){
+    
+    # assign the region name to the cells in the region
+    region_cells <- sample.region_points[[region]]
+    
+    # assign "region" to the cells in the region_cells
+    metadata[all_cells %in% region_cells, "regions"] <- region
+    
+  }
+  
+}
+```
+
+Save the metadata to the Seurat object
+```{r}
+brain <- AddMetaData(brain, metadata)
+```
+
+Example of Spatial plot coloured by region
+```{r}
+ImageDimPlot(brain, split.by = "regions")
+```
+
+Lastly, save the seurat object with the annotated regions
+```{r}
+saveRDS(brain, file.path(objects_dir,"brain_objects",
+                         "2025_01_22_brain_v1.7_region.labels_added.RDS"))
+```
+
+
+
+
+
+
+
+
+
