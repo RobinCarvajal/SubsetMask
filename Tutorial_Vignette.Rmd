@@ -285,6 +285,7 @@ for sample, mask_list in mask_dirs.items():
 ### 6.1. Make SpatialPolygons objects with the coordinates
 
 Load all the mask coordinates in a list
+
 ```{r}
 # list the samples that actually have masks (not all of them might have)
 samples <- list.files(file.path(data_dir,"regional","segmentation_mask_coords"),
@@ -293,6 +294,7 @@ samples <- list.files(file.path(data_dir,"regional","segmentation_mask_coords"),
 ```
 
 Convert the mask coordinates to `SpatialPolygons` objects and store them in a list
+
 ```{r}
 # create an empty list to store the polygon objects
 mask.polygons_list <- list()
@@ -330,6 +332,7 @@ for (sample in samples){
 ```
 
 Example of visualisation of the polygons
+
 ```{r}
 example_sample <- "s1056ant_bs4"
 example_mask <- "s1056ant_bs4-nucleus_accumbens_coords"
@@ -342,6 +345,7 @@ plot(example_polygon, col = "lightblue", border = "black")
 Load the object again if necessary(not done here)
 
 We use the coordinates in the metadata or centroids coordiantes to build SpatialPoints objects
+
 ```{r}
 # empty list to add SpatialPoints object per sample
 brain_spatial.points_list <- list()
@@ -358,6 +362,7 @@ for (sample in samples){
 ```
 
 # example of SpatialPoints object
+
 ```{r}
 plot(brain_spatial.points_list[["s1055ant_bs2"]])
 ```
@@ -365,6 +370,7 @@ plot(brain_spatial.points_list[["s1055ant_bs2"]])
 ### 6.3. Overlap SpatialPoints with SpatialPolygons for each mask
 
 Checking if the SpatialPoints object (original object) are inside the SpatialPolygons object (mask object)
+
 ```{r}
 
 # empty list to store the points inside the region masks
@@ -405,6 +411,7 @@ for (sample in samples){
 ```
 
 Example of visualisation
+
 ```{r}
 example_cells <- region.points_list[["s1055ant_bs1"]][["caudoputamen"]]
 example_subset <- subset(brain, cells =  example_cells)# subset from the brain object
@@ -412,12 +419,14 @@ example_spatial.plot <- ImageDimPlot(example_subset, boundaries = "segmentation"
 ```
 
 Save the list of cells as an object
+
 ```{r}
 saveRDS(region.points_list, file.path(data_dir,"regional",
                                  "final_region.points.RDS"))
 ```
 
-[OPTIONAL] Check the results 
+[OPTIONAL] Check the results
+
 ```{r}
 
 # Create an empty data frame
@@ -451,6 +460,7 @@ write.csv(df, file.path(data_dir,"regional",
 ## 7. Assign the region labels to the original Seurat object
 
 Load the Seurat object, region.points_list and extract the metadata
+
 ```{r}
 # Load the brain object with annotated regions
 brain <- readRDS(file.path(objects_dir,"brain_objects","2024_11_22_brain_v1.6_fine.labels_added.RDS"))
@@ -462,6 +472,7 @@ metadata <- brain@meta.data
 ```
 
 Add labels to the metadata
+
 ```{r}
 
 # create a column in the metadata object to store the region labels and set "not assigned" by default
@@ -494,26 +505,20 @@ for (sample in sample_names){
 ```
 
 Save the metadata to the Seurat object
+
 ```{r}
 brain <- AddMetaData(brain, metadata)
 ```
 
 Example of Spatial plot coloured by region
+
 ```{r}
 ImageDimPlot(brain, split.by = "regions")
 ```
 
 Lastly, save the seurat object with the annotated regions
+
 ```{r}
 saveRDS(brain, file.path(objects_dir,"brain_objects",
                          "2025_01_22_brain_v1.7_region.labels_added.RDS"))
 ```
-
-
-
-
-
-
-
-
-
