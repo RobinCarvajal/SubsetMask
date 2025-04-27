@@ -1,4 +1,9 @@
 
+# running helpers ---------------------------------------------------------
+
+export_images_dir <- file.path()
+  
+# function ----------------------------------------------------------------
 export.images <- function(seurat.object, dir.out, fov.names = NULL, ...) {
   #' Arguments
   #' seurat.object: seurat object WITH polygons/segmentation
