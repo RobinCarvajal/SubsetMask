@@ -1,5 +1,4 @@
 
-
 make.sample_fovs <- function(seurat.object, samples_column) {
   
   # get sample names 
