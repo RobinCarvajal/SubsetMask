@@ -32,8 +32,8 @@ make.sample_fovs <- function(seurat.object, samples_column) {
                      y = sample_y.coords,
                      coords="tissue")
     
-    # change key (not used for now)
-    #sample.crop@key <- paste0(sample,"_")
+    # change crop key
+    sample.crop@key <- paste0(sample,"_")
 
     # add crop to object
     seurat.object@images[[as.character(sample)]] <- sample.crop
@@ -49,6 +49,6 @@ make.sample_fovs <- function(seurat.object, samples_column) {
 }
 
 
-
+# example use s
 obj_with_fovs <- make.sample_fovs(seurat.object = obj, samples_column = "sample")
 
