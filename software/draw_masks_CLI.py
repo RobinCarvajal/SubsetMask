@@ -42,7 +42,7 @@ os.makedirs(output_dir, exist_ok=True)
 for label in labels:
     single_mask = np.full(mask.shape, 255, dtype=np.uint8)
     single_mask[mask == label] = 0
-    filename = os.path.join(output_dir, f'label{label}.png') # could also use f'mask_{label}.png'
+    filename = os.path.join(output_dir, f'label_{label}.png') # could also use f'mask_{label}.png'
     imwrite(filename, single_mask)
     print(f"Saved {filename}")
 
