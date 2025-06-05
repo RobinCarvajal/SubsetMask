@@ -47,9 +47,7 @@ spatial_points_list <- list()
 for (image in unique(meta[[images_col]])){
   
   # get cell names for the desired fov/image
-  image_cells <- meta %>%
-    filter(!!sym(images_col) == image) %>%
-    row.names()
+  image_cells <- rownames(meta[meta[[images_col]] == image, ])
   
   # get the coordinates from the metadata
   cell_coordinates <- meta[image_cells, c("x_slide_mm", "y_slide_mm")]
@@ -166,3 +164,7 @@ print(table(meta[ann_col], useNA="always"))
 # Save the annotated metadata to a CSV file --------------------------------
 write.csv(meta, file = out_path, row.names = TRUE)
 cat("Annotated metadata saved to:", out_path, "\n")
+
+
+quit(save = "no")
+# End of script -------------------------------------------------------------
