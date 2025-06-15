@@ -1,0 +1,9 @@
+LICENSE.txt
+README.md
+pyproject.toml
+subsetmask/__init__.py
+subsetmask.egg-info/PKG-INFO
+subsetmask.egg-info/SOURCES.txt
+subsetmask.egg-info/dependency_links.txt
+subsetmask.egg-info/requires.txt
+subsetmask.egg-info/top_level.txt
