@@ -1,0 +1,1574 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SubsetMask Tutorial Vignette &mdash; SubsetMask 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37044816" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="SubsetMask (v0)" href="../README.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SubsetMask
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">GENERAL</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../output_structure.html">Output Structure for SubsetMask</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">SubsetMask (v0)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">TUTORIALS</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SubsetMask Tutorial Vignette</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#1.-From-METADATA-to-IMAGE">1. From METADATA to IMAGE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#2.-From-IMAGE-to-MASK">2. From IMAGE to MASK</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#3.-From-MASK-to-COORDINATES">3. From MASK to COORDINATES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#4.-From-COORDINATES-to-ANNOTATED-METADATA">4. From COORDINATES to ANNOTATED METADATA</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SubsetMask</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SubsetMask Tutorial Vignette</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/Tutorial.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="SubsetMask-Tutorial-Vignette">
+<h1>SubsetMask Tutorial Vignette<a class="headerlink" href="#SubsetMask-Tutorial-Vignette" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Libraries needed for the tutorial</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">subsetmask</span>
+</pre></div>
+</div>
+</div>
+<section id="1.-From-METADATA-to-IMAGE">
+<h2>1. From METADATA to IMAGE<a class="headerlink" href="#1.-From-METADATA-to-IMAGE" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the metadata CSV file</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;test/slide_1_metadata_niches.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Display the first few rows of the DataFrame</span>
+<span class="n">meta</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>fov</th>
+      <th>Area</th>
+      <th>AspectRatio</th>
+      <th>x_FOV_px</th>
+      <th>y_FOV_px</th>
+      <th>Width</th>
+      <th>Height</th>
+      <th>Mean.PanCK</th>
+      <th>Max.PanCK</th>
+      <th>Mean.CD68</th>
+      <th>...</th>
+      <th>sample</th>
+      <th>condition</th>
+      <th>integrated_clusters</th>
+      <th>seurat_clusters</th>
+      <th>nCount_niche</th>
+      <th>nFeature_niche</th>
+      <th>niches_k5</th>
+      <th>InSituTypeIDs</th>
+      <th>cell_type</th>
+      <th>niche_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>c_1_100_10</th>
+      <td>100</td>
+      <td>904</td>
+      <td>0.28</td>
+      <td>3038</td>
+      <td>8</td>
+      <td>61</td>
+      <td>17</td>
+      <td>3633</td>
+      <td>11528</td>
+      <td>618</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>6</td>
+      <td>2</td>
+      <td>ATI</td>
+      <td>Macrophage</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_100</th>
+      <td>100</td>
+      <td>7195</td>
+      <td>0.58</td>
+      <td>38</td>
+      <td>555</td>
+      <td>76</td>
+      <td>132</td>
+      <td>6092</td>
+      <td>23024</td>
+      <td>572</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>3</td>
+      <td>3</td>
+      <td>30</td>
+      <td>4</td>
+      <td>2</td>
+      <td>Myofibroblast</td>
+      <td>Vascular Endothelial</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1001</th>
+      <td>100</td>
+      <td>7678</td>
+      <td>0.70</td>
+      <td>4144</td>
+      <td>4105</td>
+      <td>125</td>
+      <td>87</td>
+      <td>1513</td>
+      <td>3132</td>
+      <td>582</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>6</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1004</th>
+      <td>100</td>
+      <td>2188</td>
+      <td>0.95</td>
+      <td>4032</td>
+      <td>4097</td>
+      <td>65</td>
+      <td>62</td>
+      <td>1601</td>
+      <td>3648</td>
+      <td>1373</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>5</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1005</th>
+      <td>100</td>
+      <td>7236</td>
+      <td>0.93</td>
+      <td>3960</td>
+      <td>4134</td>
+      <td>105</td>
+      <td>113</td>
+      <td>3065</td>
+      <td>21596</td>
+      <td>704</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>4</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>c_1_171_26</th>
+      <td>171</td>
+      <td>2214</td>
+      <td>0.86</td>
+      <td>4225</td>
+      <td>25</td>
+      <td>59</td>
+      <td>51</td>
+      <td>813</td>
+      <td>1876</td>
+      <td>502</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>5</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Macrophage</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_211_1199</th>
+      <td>211</td>
+      <td>1923</td>
+      <td>0.46</td>
+      <td>1421</td>
+      <td>1651</td>
+      <td>76</td>
+      <td>35</td>
+      <td>2056</td>
+      <td>2804</td>
+      <td>670</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>3</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_189_1056</th>
+      <td>189</td>
+      <td>1143</td>
+      <td>0.85</td>
+      <td>832</td>
+      <td>1418</td>
+      <td>45</td>
+      <td>53</td>
+      <td>2509</td>
+      <td>2848</td>
+      <td>782</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_206_2593</th>
+      <td>206</td>
+      <td>5240</td>
+      <td>0.68</td>
+      <td>1334</td>
+      <td>3990</td>
+      <td>73</td>
+      <td>108</td>
+      <td>1633</td>
+      <td>2312</td>
+      <td>890</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_59_9</th>
+      <td>59</td>
+      <td>1773</td>
+      <td>0.51</td>
+      <td>4224</td>
+      <td>15</td>
+      <td>61</td>
+      <td>31</td>
+      <td>1261</td>
+      <td>1888</td>
+      <td>450</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+  </tbody>
+</table>
+<p>345085 rows × 94 columns</p>
+</div></div>
+</div>
+<p>We use <code class="docutils literal notranslate"><span class="pre">plot_image</span></code> to generate the png that we will use for subsetting the object. The argument <code class="docutils literal notranslate"><span class="pre">group_col</span></code> will use a metadata column to colour the dots in the plot, if <code class="docutils literal notranslate"><span class="pre">group_col=None</span></code> all dots will be coloured black</p>
+<p>with <code class="docutils literal notranslate"><span class="pre">group_col=None</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subsetmask</span><span class="o">.</span><span class="n">save_image</span><span class="p">(</span><span class="n">metadata_df</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+           <span class="n">images_col</span><span class="o">=</span><span class="s1">&#39;slide&#39;</span><span class="p">,</span>
+           <span class="n">image_name</span><span class="o">=</span><span class="s1">&#39;slide_1&#39;</span><span class="p">,</span>
+           <span class="n">x_col</span><span class="o">=</span><span class="s1">&#39;x_slide_mm&#39;</span><span class="p">,</span>
+           <span class="n">y_col</span><span class="o">=</span><span class="s1">&#39;y_slide_mm&#39;</span><span class="p">,</span>
+           <span class="n">group_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">output_path</span><span class="o">=</span><span class="s1">&#39;test/slide_1/plot.png&#39;</span><span class="p">,</span>
+           <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+           <span class="n">dpi</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
+           <span class="n">dot_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;tab20&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>with <code class="docutils literal notranslate"><span class="pre">group_col=&quot;niche_name&quot;</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subsetmask</span><span class="o">.</span><span class="n">save_image</span><span class="p">(</span><span class="n">metadata_df</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+           <span class="n">images_col</span><span class="o">=</span><span class="s1">&#39;slide&#39;</span><span class="p">,</span>
+           <span class="n">image_name</span><span class="o">=</span><span class="s1">&#39;slide_1&#39;</span><span class="p">,</span>
+           <span class="n">x_col</span><span class="o">=</span><span class="s1">&#39;x_slide_mm&#39;</span><span class="p">,</span>
+           <span class="n">y_col</span><span class="o">=</span><span class="s1">&#39;y_slide_mm&#39;</span><span class="p">,</span>
+           <span class="n">group_col</span><span class="o">=</span><span class="s1">&#39;niche_name&#39;</span><span class="p">,</span>
+           <span class="n">output_path</span><span class="o">=</span><span class="s1">&#39;test/slide_1/plot_coloured.png&#39;</span><span class="p">,</span>
+           <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+           <span class="n">dpi</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
+           <span class="n">dot_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+           <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;tab20&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="2.-From-IMAGE-to-MASK">
+<h2>2. From IMAGE to MASK<a class="headerlink" href="#2.-From-IMAGE-to-MASK" title="Link to this heading"></a></h2>
+<p>Needed libs for this part</p>
+<p>We need the path of the saved image (.png)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">image_path</span> <span class="o">=</span> <span class="s2">&quot;test/slide_1/plot_coloured.png&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>We use the function <code class="docutils literal notranslate"><span class="pre">label_image</span></code> to visualise the image and label the desired regions. Once we have labelled our image. We minimise the napari window (don’t close it yet!).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">label_image</span><span class="p">(</span><span class="n">image_path</span><span class="o">=</span><span class="n">image_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/opt/homebrew/lib/python3.11/site-packages/PIL/Image.py:3442: DecompressionBombWarning: Image size (135000000 pixels) exceeds limit of 89478485 pixels, could be decompression bomb DOS attack.
+  warnings.warn(
+</pre></div></div>
+</div>
+<p>We then can save the labels as masks with the <code class="docutils literal notranslate"><span class="pre">save_masks</span></code> function to our desired output location. If the location does not exist, it will be created</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">masks_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;test/slide_1/masks&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">subsetmask</span><span class="o">.</span><span class="n">save_masks</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">masks_dir</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All masks saved successfully.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Saved mask for label 1 at test/slide_1/masks/label_1.png
+Saved mask for label 2 at test/slide_1/masks/label_2.png
+All masks saved successfully.
+All masks saved successfully.
+</pre></div></div>
+</div>
+<p>After we have saved the masks we can close the Napari window.</p>
+</section>
+<section id="3.-From-MASK-to-COORDINATES">
+<h2>3. From MASK to COORDINATES<a class="headerlink" href="#3.-From-MASK-to-COORDINATES" title="Link to this heading"></a></h2>
+<p>To start we load the metadata</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the metadata CSV file</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;test/slide_1_metadata_niches.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Display the first few rows of the DataFrame</span>
+<span class="n">meta</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>fov</th>
+      <th>Area</th>
+      <th>AspectRatio</th>
+      <th>x_FOV_px</th>
+      <th>y_FOV_px</th>
+      <th>Width</th>
+      <th>Height</th>
+      <th>Mean.PanCK</th>
+      <th>Max.PanCK</th>
+      <th>Mean.CD68</th>
+      <th>...</th>
+      <th>sample</th>
+      <th>condition</th>
+      <th>integrated_clusters</th>
+      <th>seurat_clusters</th>
+      <th>nCount_niche</th>
+      <th>nFeature_niche</th>
+      <th>niches_k5</th>
+      <th>InSituTypeIDs</th>
+      <th>cell_type</th>
+      <th>niche_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>c_1_100_10</th>
+      <td>100</td>
+      <td>904</td>
+      <td>0.28</td>
+      <td>3038</td>
+      <td>8</td>
+      <td>61</td>
+      <td>17</td>
+      <td>3633</td>
+      <td>11528</td>
+      <td>618</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>6</td>
+      <td>2</td>
+      <td>ATI</td>
+      <td>Macrophage</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_100</th>
+      <td>100</td>
+      <td>7195</td>
+      <td>0.58</td>
+      <td>38</td>
+      <td>555</td>
+      <td>76</td>
+      <td>132</td>
+      <td>6092</td>
+      <td>23024</td>
+      <td>572</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>3</td>
+      <td>3</td>
+      <td>30</td>
+      <td>4</td>
+      <td>2</td>
+      <td>Myofibroblast</td>
+      <td>Vascular Endothelial</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1001</th>
+      <td>100</td>
+      <td>7678</td>
+      <td>0.70</td>
+      <td>4144</td>
+      <td>4105</td>
+      <td>125</td>
+      <td>87</td>
+      <td>1513</td>
+      <td>3132</td>
+      <td>582</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>6</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1004</th>
+      <td>100</td>
+      <td>2188</td>
+      <td>0.95</td>
+      <td>4032</td>
+      <td>4097</td>
+      <td>65</td>
+      <td>62</td>
+      <td>1601</td>
+      <td>3648</td>
+      <td>1373</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>5</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1005</th>
+      <td>100</td>
+      <td>7236</td>
+      <td>0.93</td>
+      <td>3960</td>
+      <td>4134</td>
+      <td>105</td>
+      <td>113</td>
+      <td>3065</td>
+      <td>21596</td>
+      <td>704</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>4</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>c_1_171_26</th>
+      <td>171</td>
+      <td>2214</td>
+      <td>0.86</td>
+      <td>4225</td>
+      <td>25</td>
+      <td>59</td>
+      <td>51</td>
+      <td>813</td>
+      <td>1876</td>
+      <td>502</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>5</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Macrophage</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_211_1199</th>
+      <td>211</td>
+      <td>1923</td>
+      <td>0.46</td>
+      <td>1421</td>
+      <td>1651</td>
+      <td>76</td>
+      <td>35</td>
+      <td>2056</td>
+      <td>2804</td>
+      <td>670</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>3</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_189_1056</th>
+      <td>189</td>
+      <td>1143</td>
+      <td>0.85</td>
+      <td>832</td>
+      <td>1418</td>
+      <td>45</td>
+      <td>53</td>
+      <td>2509</td>
+      <td>2848</td>
+      <td>782</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_206_2593</th>
+      <td>206</td>
+      <td>5240</td>
+      <td>0.68</td>
+      <td>1334</td>
+      <td>3990</td>
+      <td>73</td>
+      <td>108</td>
+      <td>1633</td>
+      <td>2312</td>
+      <td>890</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_59_9</th>
+      <td>59</td>
+      <td>1773</td>
+      <td>0.51</td>
+      <td>4224</td>
+      <td>15</td>
+      <td>61</td>
+      <td>31</td>
+      <td>1261</td>
+      <td>1888</td>
+      <td>450</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+  </tbody>
+</table>
+<p>345085 rows × 94 columns</p>
+</div></div>
+</div>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">get_image_dims</span></code> to get the dimensions of the desired image (for scaling).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example usage of get_mask_coords</span>
+<span class="n">slide_1_dims</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">get_image_dims</span><span class="p">(</span>
+    <span class="n">metadata_df</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+    <span class="n">images_col</span><span class="o">=</span><span class="s2">&quot;slide&quot;</span><span class="p">,</span>
+    <span class="n">image_name</span><span class="o">=</span><span class="s2">&quot;slide_1&quot;</span><span class="p">,</span>
+    <span class="n">x_col</span><span class="o">=</span><span class="s2">&quot;x_slide_mm&quot;</span><span class="p">,</span>
+    <span class="n">y_col</span><span class="o">=</span><span class="s2">&quot;y_slide_mm&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Slide 1 Dimensions:&quot;</span><span class="p">,</span> <span class="n">slide_1_dims</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Slide 1 Dimensions: {&#39;x_min&#39;: np.float64(0.00144337134), &#39;y_min&#39;: np.float64(-0.50542053089), &#39;x_max&#39;: np.float64(10.985981201804), &#39;y_max&#39;: np.float64(18.2862895684368)}
+</pre></div></div>
+</div>
+<p>Now we beed to transform the contour of our images into coordinates. For that we use the <code class="docutils literal notranslate"><span class="pre">get_mask_coords</span></code> function. Normally we will have more than one mask of which we want the coordinates, so we will have to loop through them.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the directory as a Path object</span>
+<span class="n">masks_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;test/slide_1/masks&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get all file names in the directory</span>
+<span class="n">mask_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">masks_dir</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mask_names</span><span class="p">)</span>
+
+<span class="c1"># Get full paths to each mask</span>
+<span class="n">mask_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">masks_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>  <span class="c1"># Or add filter: masks_dir.glob(&quot;*.png&quot;)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mask_paths</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;label_2.png&#39;, &#39;label_1.png&#39;]
+[PosixPath(&#39;test/slide_1/masks/label_2.png&#39;), PosixPath(&#39;test/slide_1/masks/label_1.png&#39;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;test/slide_1/coordinates&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">out_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output directory </span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s2"> already exists.&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Output directory test/slide_1/coordinates already exists.
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">mask_path</span> <span class="ow">in</span> <span class="n">mask_paths</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing mask: </span><span class="si">{</span><span class="n">mask_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Get coordinates for each mask</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">get_mask_coords</span><span class="p">(</span><span class="n">mask_path</span><span class="o">=</span><span class="n">mask_path</span><span class="p">,</span>
+                             <span class="n">x_min</span><span class="o">=</span><span class="n">slide_1_dims</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">],</span>
+                             <span class="n">x_max</span><span class="o">=</span><span class="n">slide_1_dims</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">],</span>
+                             <span class="n">y_min</span><span class="o">=</span><span class="n">slide_1_dims</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">],</span>
+                             <span class="n">y_max</span><span class="o">=</span><span class="n">slide_1_dims</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">],</span>
+                             <span class="n">out</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">mask_path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing mask: test/slide_1/masks/label_2.png
+Coordinates have been saved to test/slide_1/coordinates/label_2.csv
+Processing mask: test/slide_1/masks/label_1.png
+Coordinates have been saved to test/slide_1/coordinates/label_1.csv
+</pre></div></div>
+</div>
+</section>
+<section id="4.-From-COORDINATES-to-ANNOTATED-METADATA">
+<h2>4. From COORDINATES to ANNOTATED METADATA<a class="headerlink" href="#4.-From-COORDINATES-to-ANNOTATED-METADATA" title="Link to this heading"></a></h2>
+<p>Load metadata to get the full slide coordinates. We use the package <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to load the table.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the metadata CSV file</span>
+<span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;test/slide_1_metadata_niches.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Display the first few rows of the DataFrame</span>
+<span class="n">meta</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>fov</th>
+      <th>Area</th>
+      <th>AspectRatio</th>
+      <th>x_FOV_px</th>
+      <th>y_FOV_px</th>
+      <th>Width</th>
+      <th>Height</th>
+      <th>Mean.PanCK</th>
+      <th>Max.PanCK</th>
+      <th>Mean.CD68</th>
+      <th>...</th>
+      <th>sample</th>
+      <th>condition</th>
+      <th>integrated_clusters</th>
+      <th>seurat_clusters</th>
+      <th>nCount_niche</th>
+      <th>nFeature_niche</th>
+      <th>niches_k5</th>
+      <th>InSituTypeIDs</th>
+      <th>cell_type</th>
+      <th>niche_name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>c_1_100_10</th>
+      <td>100</td>
+      <td>904</td>
+      <td>0.28</td>
+      <td>3038</td>
+      <td>8</td>
+      <td>61</td>
+      <td>17</td>
+      <td>3633</td>
+      <td>11528</td>
+      <td>618</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>6</td>
+      <td>2</td>
+      <td>ATI</td>
+      <td>Macrophage</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_100</th>
+      <td>100</td>
+      <td>7195</td>
+      <td>0.58</td>
+      <td>38</td>
+      <td>555</td>
+      <td>76</td>
+      <td>132</td>
+      <td>6092</td>
+      <td>23024</td>
+      <td>572</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>3</td>
+      <td>3</td>
+      <td>30</td>
+      <td>4</td>
+      <td>2</td>
+      <td>Myofibroblast</td>
+      <td>Vascular Endothelial</td>
+      <td>Alverolar-Capillary</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1001</th>
+      <td>100</td>
+      <td>7678</td>
+      <td>0.70</td>
+      <td>4144</td>
+      <td>4105</td>
+      <td>125</td>
+      <td>87</td>
+      <td>1513</td>
+      <td>3132</td>
+      <td>582</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>6</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1004</th>
+      <td>100</td>
+      <td>2188</td>
+      <td>0.95</td>
+      <td>4032</td>
+      <td>4097</td>
+      <td>65</td>
+      <td>62</td>
+      <td>1601</td>
+      <td>3648</td>
+      <td>1373</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>5</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1005</th>
+      <td>100</td>
+      <td>7236</td>
+      <td>0.93</td>
+      <td>3960</td>
+      <td>4134</td>
+      <td>105</td>
+      <td>113</td>
+      <td>3065</td>
+      <td>21596</td>
+      <td>704</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>2</td>
+      <td>2</td>
+      <td>30</td>
+      <td>4</td>
+      <td>4</td>
+      <td>T_Cytotoxic</td>
+      <td>T</td>
+      <td>Lymphoid_Enriched</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>c_1_171_26</th>
+      <td>171</td>
+      <td>2214</td>
+      <td>0.86</td>
+      <td>4225</td>
+      <td>25</td>
+      <td>59</td>
+      <td>51</td>
+      <td>813</td>
+      <td>1876</td>
+      <td>502</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>9</td>
+      <td>9</td>
+      <td>30</td>
+      <td>5</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Macrophage</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_211_1199</th>
+      <td>211</td>
+      <td>1923</td>
+      <td>0.46</td>
+      <td>1421</td>
+      <td>1651</td>
+      <td>76</td>
+      <td>35</td>
+      <td>2056</td>
+      <td>2804</td>
+      <td>670</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>3</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_189_1056</th>
+      <td>189</td>
+      <td>1143</td>
+      <td>0.85</td>
+      <td>832</td>
+      <td>1418</td>
+      <td>45</td>
+      <td>53</td>
+      <td>2509</td>
+      <td>2848</td>
+      <td>782</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_206_2593</th>
+      <td>206</td>
+      <td>5240</td>
+      <td>0.68</td>
+      <td>1334</td>
+      <td>3990</td>
+      <td>73</td>
+      <td>108</td>
+      <td>1633</td>
+      <td>2312</td>
+      <td>890</td>
+      <td>...</td>
+      <td>sample_2</td>
+      <td>CTRL</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+    <tr>
+      <th>c_1_59_9</th>
+      <td>59</td>
+      <td>1773</td>
+      <td>0.51</td>
+      <td>4224</td>
+      <td>15</td>
+      <td>61</td>
+      <td>31</td>
+      <td>1261</td>
+      <td>1888</td>
+      <td>450</td>
+      <td>...</td>
+      <td>sample_1</td>
+      <td>CF</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4</td>
+      <td>1</td>
+      <td>B_Plasma</td>
+      <td>Plasma</td>
+      <td>Tertiary_Lymphoid_Structure</td>
+    </tr>
+  </tbody>
+</table>
+<p>345085 rows × 94 columns</p>
+</div></div>
+</div>
+<p>If we have multiple slides on out metadata we can use <code class="docutils literal notranslate"><span class="pre">get_image_coords</span></code> to get the coordinates from a specific image (normally a slide)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">slide_1_image_coords</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">get_image_coords</span><span class="p">(</span><span class="n">metadata_df</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+                                                   <span class="n">images_col</span><span class="o">=</span><span class="s2">&quot;slide&quot;</span><span class="p">,</span>
+                                                   <span class="n">image_name</span><span class="o">=</span><span class="s2">&quot;slide_1&quot;</span><span class="p">,</span>
+                                                   <span class="n">x_col</span><span class="o">=</span><span class="s2">&quot;x_slide_mm&quot;</span><span class="p">,</span>
+                                                   <span class="n">y_col</span><span class="o">=</span><span class="s2">&quot;y_slide_mm&quot;</span><span class="p">)</span>
+
+<span class="n">slide_1_image_coords</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x_slide_mm</th>
+      <th>y_slide_mm</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>c_1_100_10</th>
+      <td>7.385973</td>
+      <td>11.973767</td>
+    </tr>
+    <tr>
+      <th>c_1_100_100</th>
+      <td>7.025130</td>
+      <td>11.907973</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1001</th>
+      <td>7.519003</td>
+      <td>11.480976</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1004</th>
+      <td>7.505532</td>
+      <td>11.481938</td>
+    </tr>
+    <tr>
+      <th>c_1_100_1005</th>
+      <td>7.496872</td>
+      <td>11.477488</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>c_1_171_26</th>
+      <td>1.020103</td>
+      <td>4.454418</td>
+    </tr>
+    <tr>
+      <th>c_1_211_1199</th>
+      <td>7.341589</td>
+      <td>1.660291</td>
+    </tr>
+    <tr>
+      <th>c_1_189_1056</th>
+      <td>0.611989</td>
+      <td>2.239204</td>
+    </tr>
+    <tr>
+      <th>c_1_206_2593</th>
+      <td>7.331124</td>
+      <td>1.890870</td>
+    </tr>
+    <tr>
+      <th>c_1_59_9</th>
+      <td>9.576289</td>
+      <td>15.556335</td>
+    </tr>
+  </tbody>
+</table>
+<p>345085 rows × 2 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mask_coords_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;test/slide_1/coordinates&quot;</span><span class="p">)</span>
+<span class="n">mask_coords_dict</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">make_mask_coords_dict</span><span class="p">(</span><span class="n">mask_coords_dir</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">mask_coords_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;label_1&#39;, &#39;label_2&#39;])
+</pre></div></div>
+</div>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">get_cell_names</span></code> function to get the names/barcodes of the cells that are contained in each of the masks</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># test function above</span>
+<span class="n">cell_names_dict</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">get_cell_names</span><span class="p">(</span><span class="n">image_coords</span><span class="o">=</span><span class="n">slide_1_image_coords</span><span class="p">,</span>
+                                            <span class="n">x_name</span><span class="o">=</span><span class="s2">&quot;x_slide_mm&quot;</span><span class="p">,</span>
+                                            <span class="n">y_name</span><span class="o">=</span><span class="s2">&quot;y_slide_mm&quot;</span><span class="p">,</span>
+                                            <span class="n">mask_coords_dict</span><span class="o">=</span><span class="n">mask_coords_dict</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cell_names_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+dict_keys([&#39;label_1&#39;, &#39;label_2&#39;])
+</pre></div></div>
+</div>
+<p>(OPTIONAL) We can use the <code class="docutils literal notranslate"><span class="pre">rename_keys</span></code> to assign different names to the labels we gave the masks. E.g. change “label1” for “sample1”</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the original dictionary keys</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Original cell names dictionary keys:&quot;</span><span class="p">,</span> <span class="n">cell_names_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="c1"># Rename keys in the cell names dictionary</span>
+
+<span class="n">key_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;label_1&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;label_2&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_2&quot;</span><span class="p">,</span>
+    <span class="c1"># Add more mappings as needed</span>
+<span class="p">}</span>
+
+<span class="n">cell_names_dict</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">rename_keys</span><span class="p">(</span><span class="n">original_dict</span><span class="o">=</span><span class="n">cell_names_dict</span><span class="p">,</span> <span class="n">key_mapping</span><span class="o">=</span><span class="n">key_mapping</span><span class="p">)</span>
+<span class="c1"># Print the renamed dictionary</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Renamed cell names dictionary keys:&quot;</span><span class="p">,</span> <span class="n">cell_names_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Original cell names dictionary keys: dict_keys([&#39;label_1&#39;, &#39;label_2&#39;])
+Renamed cell names dictionary keys: dict_keys([&#39;sample_1&#39;, &#39;sample_2&#39;])
+</pre></div></div>
+</div>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">annotate_metadata</span></code> function to map cell names to a column in the metadata (if it does not exist it will create it).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># test the function above</span>
+<span class="n">annotated_meta</span> <span class="o">=</span> <span class="n">subsetmask</span><span class="o">.</span><span class="n">annotate_metadata</span><span class="p">(</span><span class="n">cell_names_dict</span> <span class="o">=</span> <span class="n">cell_names_dict</span><span class="p">,</span>
+                                              <span class="n">metadata_df</span> <span class="o">=</span> <span class="n">meta</span><span class="p">,</span>
+                                              <span class="n">ann_col_name</span> <span class="o">=</span> <span class="s2">&quot;sample_test&quot;</span><span class="p">)</span>
+
+<span class="c1"># get a summary table of the annotated column in metadata</span>
+<span class="n">summary_table</span> <span class="o">=</span> <span class="n">annotated_meta</span><span class="p">[</span><span class="s2">&quot;sample_test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary_table</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+sample_test
+not_assigned    339044
+sample_1          4242
+sample_2          1799
+Name: count, dtype: int64
+</pre></div></div>
+</div>
+<p>Finally, we use the <code class="docutils literal notranslate"><span class="pre">export_annotated_metadata()</span></code> function to save the annotated metadata. You can choose to export the entire table <code class="docutils literal notranslate"><span class="pre">(full_metadata=True)</span></code> or a trimmed version <code class="docutils literal notranslate"><span class="pre">(full_metadata=False)</span></code> that includes only selected columns. Exporting the full metadata may take significantly longer depending on the size of the dataset, but it requires no additional processing and is ready to be used directly in Seurat or Squidpy objects.</p>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">full_metadata=False</span></code> (default) option</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># test function above</span>
+<span class="n">annotated_cols</span> <span class="o">=</span> <span class="s2">&quot;sample_test&quot;</span>
+<span class="n">trimmed_meta_output_path</span> <span class="o">=</span> <span class="s2">&quot;test/slide_1_metadata_annotated_trimmed.csv&quot;</span>
+
+<span class="n">subsetmask</span><span class="o">.</span><span class="n">save_annotated_metadata</span><span class="p">(</span><span class="n">annotated_meta</span><span class="o">=</span><span class="n">annotated_meta</span><span class="p">,</span>
+                          <span class="n">keep_cols</span><span class="o">=</span><span class="n">annotated_cols</span><span class="p">,</span>
+                          <span class="n">output_path</span><span class="o">=</span><span class="n">trimmed_meta_output_path</span><span class="p">,</span> <span class="n">full_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Annotated metadata exported to test/slide_1_metadata_annotated_trimmed.csv
+</pre></div></div>
+</div>
+<p>Using the <code class="docutils literal notranslate"><span class="pre">full_metadata=True</span></code> option</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_meta_output_path</span> <span class="o">=</span> <span class="s2">&quot;test/slide_1_metadata_annotated_full.csv&quot;</span>
+
+<span class="n">subsetmask</span><span class="o">.</span><span class="n">save_annotated_metadata</span><span class="p">(</span><span class="n">annotated_meta</span><span class="o">=</span><span class="n">annotated_meta</span><span class="p">,</span>
+                          <span class="n">keep_cols</span><span class="o">=</span><span class="n">annotated_cols</span><span class="p">,</span>
+                          <span class="n">output_path</span><span class="o">=</span><span class="n">full_meta_output_path</span><span class="p">,</span>
+                          <span class="n">full_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Annotated metadata exported to test/slide_1_metadata_annotated_full.csv
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../README.html" class="btn btn-neutral float-left" title="SubsetMask (v0)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Robin Carvajal.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

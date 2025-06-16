@@ -1,0 +1,49 @@
+# Output Structure for SubsetMask
+
+This folder layout represents the **recommended organization** for output files generated using **SubsetMask**.
+
+Each **image** (used for manual annotation) is assigned a dedicated folder containing its respective mask and coordinate outputs. Multiple image folders can be created and used to annotate the **same metadata file**.
+
+> **Note:**
+> Each image can correspond to a full slide, a tissue sample, or any previously subsetted region that has already been annotated in the metadata.
+
+```
+image_annotations/
+├── image_1/
+│   ├── coordinates/
+│   │   ├── label_1.csv
+│   │   └── label_2.csv
+│   ├── image_dimensions.csv
+│   ├── masks/
+│   │   ├── label_1.png
+│   │   └── label_2.png
+│   └── plot.png
+├── image_2/
+│   ├── coordinates/
+│   │   ├── label_1.csv
+│   │   └── label_2.csv
+│   ├── image_dimensions.csv
+│   ├── masks/
+│   │   ├── label_1.png
+│   │   └── label_2.png
+│   └── plot.png
+├── metadata_annotated_full.csv
+├── metadata_annotated_trimmed.csv
+└── metadata.csv
+```
+
+### Contents
+
+* `image_1/`, `image_2/`, ...: Contain annotation data for each image.
+
+  * `coordinates/`: CSV files of polygon coordinates per label.
+  * `masks/`: PNG mask files matching each label.
+  * `image_dimensions.csv`: Used to rescale or reproject masks if needed.
+  * `plot.png`: Visual summary of the annotated regions.
+
+* `metadata_annotated_full.csv`: Full annotated metadata from all image-based subsetting.
+
+* `metadata_annotated_trimmed.csv`: Subsetted metadata (only matching cells).
+
+* `metadata.csv`: Optional niche-level annotation output.
+

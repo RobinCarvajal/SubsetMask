@@ -1,0 +1,23 @@
+/* Sidebar background */
+.wy-side-nav-search {
+  background-color: #ff69b4 !important; /* pink background */
+}
+
+/* Logo text (project name in sidebar) */
+.wy-side-nav-search .project,
+.wy-side-nav-search .project:visited,
+.wy-side-nav-search .project:hover {
+  color: #ffffff !important;     /* force white */
+  font-weight: bold !important;
+  font-size: 150% !important; /* larger font size */
+}
+
+/* Optional: sidebar text color for general visibility */
+.wy-menu-vertical a {
+  color: #ffffff !important;
+}
+
+/* Sidebar section titles (like GENERAL, TUTORIALS) */
+.wy-menu .caption-text {
+    color: #ff4da6 !important; /* bright pink */
+}
