@@ -3,13 +3,17 @@
   background-color: #ff69b4 !important; /* pink background */
 }
 
+/* Sidebar background (below search) white */
+.wy-nav-side {
+  background: #d3d3d3 !important;
+}
+
 /* Logo text (project name in sidebar) */
 .wy-side-nav-search .project,
 .wy-side-nav-search .project:visited,
 .wy-side-nav-search .project:hover {
   color: #ffffff !important;     /* force white */
   font-weight: bold !important;
-  font-size: 150% !important; /* larger font size */
 }
 
 /* Optional: sidebar text color for general visibility */
@@ -20,4 +24,29 @@
 /* Sidebar section titles (like GENERAL, TUTORIALS) */
 .wy-menu .caption-text {
     color: #ff4da6 !important; /* bright pink */
+}
+
+/* Hide execution boxes */
+div.nbinput .prompt,
+div.nboutput .prompt {
+  display: none !important;
+}
+
+/* Sidebar link text */
+.wy-menu-vertical a {
+  color: #000000 !important;       /* black text */
+}
+
+/* Sidebar section headers */
+.wy-menu-vertical header,
+.wy-menu-vertical .caption-text {
+  color: #000000 !important;       /* black headers */
+}
+
+/* Selected/hovered link styling */
+.wy-menu-vertical a:hover,
+.wy-menu-vertical a:focus,
+.wy-menu-vertical .current a {
+  background-color: #c0c0c0 !important;
+  color: #000000 !important;
 }

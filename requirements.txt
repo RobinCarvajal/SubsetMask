@@ -2,7 +2,7 @@ geopandas==1.1.0
 imageio==2.37.0
 matplotlib==3.10.3
 napari==0.6.1
-numpy==1.6.0
+numpy==1.26.4
 opencv_python==4.11.0.86
 pandas==2.3.0
-Shapely==2.1.1
+Shapely==2.0.6

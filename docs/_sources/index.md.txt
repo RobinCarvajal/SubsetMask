@@ -3,17 +3,27 @@
 
 **SubsetMask** is a lightweight toolkit designed to help researchers subset Spatially Resolved Transcriptomics (SRT) data objects—such as those from **CosMx** and **Xenium** platforms. It can be applied to any transcriptomics dataset that includes spatial coordinate metadata (`x`, `y`), making it broadly useful across SRT technologies.
 
+## Installation
+
+To install the latest development version from GitHub:
+
+```bash
+pip install git+https://github.com/RobinCarvajal/SubsetMask.git
+```
+
+
 
 ```{toctree}
 :maxdepth: 1
 :caption: GENERAL
 
-output_structure.md
-README.md
+package_description.md
+installation_guide.md
 ```
 ```{toctree}
 :maxdepth: 2
 :caption: TUTORIALS
 
-tutorials/Tutorial.ipynb
+tutorials/image_class_tutorial.ipynb
 ```
+

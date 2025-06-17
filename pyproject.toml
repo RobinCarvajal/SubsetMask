@@ -1,21 +1,21 @@
 [project]
 name = "subsetmask"
-version = "0.1.0"
+version = "0.0.2"
 description = "Toolkit for subsetting spatial transcriptomics datasets with coordinate-based masking."
 authors = [
-  { name = "Robin Carvajal", email = "your@email.com" }
+  { name = "Robin Carvajal", email = "robin.carvajal@glasgow.ac.uk" }
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dependencies = [
   "geopandas==1.1.0",
   "imageio==2.37.0",
   "matplotlib==3.10.3",
   "napari==0.6.1",
-  "numpy==1.6.0",
+  "numpy==1.26.4",
   "opencv-python==4.11.0.86",
   "pandas==2.3.0",
-  "shapely==2.1.1"
+  "shapely==2.0.6"
 ]
 
 [build-system]

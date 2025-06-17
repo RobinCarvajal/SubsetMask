@@ -1,12 +1,12 @@
-## 📦 Installation Guide for **SubsetMask**
+# Installation Guide
 
 SubsetMask is a lightweight toolkit for coordinate-based subsetting of spatial transcriptomics datasets, with support for interactive region selection.
 
 ---
 
-### 🔧 Option 1: Install from local folder (downloaded or cloned)
+## Install from local folder (downloaded or cloned)
 
-#### ✅ Step-by-step
+### ✅ Step-by-step
 
 1. **Clone or download the repository**:
 
@@ -14,7 +14,7 @@ SubsetMask is a lightweight toolkit for coordinate-based subsetting of spatial t
 git clone https://github.com/RobinCarvajal/SubsetMask.git
 ```
 
-Or [download the ZIP](https://github.com/yourusername/SubsetMask/archive/refs/heads/main.zip) and unzip it.
+Or [download the ZIP](https://github.com/RobinCarvajal/SubsetMask/archive/refs/heads/main.zip) and unzip it.
 
 2. **Navigate into the project directory**:
 
@@ -58,15 +58,5 @@ pip install -r requirements.txt
 After installation, you should be able to run:
 
 ```python
-import subsetmask as .
+import subsetmask as sm
 ```
-
----
-
-### 📚 Getting Started
-
-Check out `tutorial.ipynb` for example usage.
-
----
-
-Would you like this as a separate `INSTALL.md` file, or merged into your `README.md` under an “Installation” section?

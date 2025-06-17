@@ -1,0 +1,155 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "8e4f071e",
+   "metadata": {},
+   "source": [
+    "# Workflow tutorial"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "22790af7",
+   "metadata": {},
+   "source": [
+    "Import the `subsetmask` package"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "3a700930",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import subsetmask as sm"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c60c7e9a",
+   "metadata": {},
+   "source": [
+    "Load the metadata as a `pandas` data frame"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "59e21068",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Load the metadata CSV file\n",
+    "meta = pd.read_csv(\"test/metadata.csv\", index_col=0, header=0) "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "363ca92d",
+   "metadata": {},
+   "source": [
+    "We use the `Image` class"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "eed9328e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "image = sm.Image(metadata_df=meta, \n",
+    "                  images_col='slide',\n",
+    "                  image_name='slide_1',\n",
+    "                  x_col='x_slide_mm',\n",
+    "                  y_col='y_slide_mm')\n",
+    "\n",
+    "# addd store image method\n",
+    "image.store_image(group_col=None, figsize=(30, 50), dpi=300, dot_size=5, cmap='tab20')\n",
+    "\n",
+    "# launches napari with the generated image\n",
+    "image.draw_labels()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5a11236a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# without closing napari we run this line to save the annotations\n",
+    "image.save_annotations(ann_col_name=\"new_col\")\n",
+    "\n",
+    "# we change our annotations for something more meaningful\n",
+    "map = {\n",
+    "    \"label_1\": \"sample_1\",\n",
+    "    \"label_2\": \"sample_2\"\n",
+    "}\n",
+    "\n",
+    "image.rename_annotations(ann_col_name=\"new_col\", mapping_dict=map)\n",
+    "\n",
+    "# we extract the annotated df from the object\n",
+    "annotated_meta = image.annotated_metadata_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "272f38b8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "new_col     \n",
+      "not_assigned    205211\n",
+      "sample_2         75815\n",
+      "sample_1         64059\n",
+      "Name: count, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# we verify the value counts of the new column\n",
+    "print(annotated_meta[[\"new_col\"]].value_counts())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3f0e7634",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# now just save the annotated metadata\n",
+    "annotated_meta.to_csv(\"test/metadata_annotated.csv\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "cosmx_python",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

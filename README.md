@@ -36,7 +36,7 @@ masked_data = apply_mask_to_coordinates(dataframe, polygon_coords)
 * numpy==2.3.0
 * opencv_python==4.11.0.86
 * pandas==2.3.0
-* Shapely==2.1.1
+* Shapely==2.0.6
 
 ## Project Structure
 
