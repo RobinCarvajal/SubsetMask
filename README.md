@@ -1,5 +1,4 @@
-
-# SubsetMask (v0)
+# SubsetMask
 
 **SubsetMask** is a lightweight toolkit designed to help researchers subset Spatially Resolved Transcriptomics (SRT) data objects—such as those from **CosMx** and **Xenium** platforms. It can be applied to any transcriptomics dataset that includes spatial coordinate metadata (`x`, `y`), making it broadly useful across SRT technologies.
 
@@ -15,16 +14,48 @@
 To install the latest development version from GitHub:
 
 ```bash
-pip install git+https://github.com/yourusername/SubsetMask.git
+pip install git+https://github.com/RobinCarvajal/SubsetMask.git
 ```
 
 ## Usage Example
 
 ```python
-from subsetmask import apply_mask_to_coordinates
+import pandas as pd
+import subsetmask as sm
 
-# Example: apply a polygon mask to a dataset
-masked_data = apply_mask_to_coordinates(dataframe, polygon_coords)
+# Load the metadata CSV file
+meta = pd.read_csv("test/metadata.csv", index_col=0, header=0) 
+
+# test
+image = sm.Image(metadata_df=meta, 
+                  images_col='slide',
+                  image_name='slide_1',
+                  x_col='x_slide_mm',
+                  y_col='y_slide_mm')
+
+# addd store image method
+image.store_image(group_col=None, figsize=(30, 50), dpi=300, dot_size=5, cmap='tab20')
+
+# launches napari with the generated image
+image.draw_labels()
+
+# without closing napari we run this line to save the annotations
+image.save_annotations(ann_col_name="new_col")
+
+# we change our annotations for something more meaningful
+map = {
+    "label_1": "sample_1",
+    "label_2": "sample_2"
+}
+
+image.rename_annotations(ann_col_name="new_col", mapping_dict=map)
+
+# we extract the annotated df from the object
+annotated_meta = image.annotated_metadata_df
+
+# now just save the annotated metadata
+annotated_meta.to_csv("test/metadata_with_labels.csv")
+
 ```
 
 ## Requirements
@@ -33,7 +64,7 @@ masked_data = apply_mask_to_coordinates(dataframe, polygon_coords)
 * imageio==2.37.0
 * matplotlib==3.10.3
 * napari==0.6.1
-* numpy==2.3.0
+* numpy==1.6.0
 * opencv_python==4.11.0.86
 * pandas==2.3.0
 * Shapely==2.0.6
@@ -41,15 +72,16 @@ masked_data = apply_mask_to_coordinates(dataframe, polygon_coords)
 ## Project Structure
 
 ```
+
 SubsetMask/
 ├── subsetmask/        # Core package code (with __init__.py)
-│   ├── core.py
-│   ├── utils.py
-├── tests/             # Unit tests
-├── Tutorial.ipynb     # Example notebook with real-world usage
+│   ├── image_class.py
+│   ├── image_helpers.py
+├── docs/              # Documentation
 ├── pyproject.toml     # Package configuration
 ├── README.md
 ├── LICENSE.txt
+
 ```
 
 ## Contributing
@@ -58,4 +90,4 @@ Contributions, issues, and feature requests are welcome. Please open a pull requ
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GPL-3 License.
