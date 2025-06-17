@@ -9,6 +9,11 @@
 * Modular and scriptable for integration into spatial analysis workflows
 * Designed with reproducibility and simplicity in mind
 
+## Documentation
+
+You can find detailed documentation at: [https://robincarvajal.github.io/SubsetMask/](https://robincarvajal.github.io/SubsetMask/)
+
+
 ## Installation
 
 To install the latest development version from GitHub:
