@@ -90,4 +90,4 @@ Contributions, issues, and feature requests are welcome. Please open a pull requ
 
 ## License
 
-This project is licensed under the GPL-3 License.
+This project is licensed under the GPL-3.0 License.
