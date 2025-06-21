@@ -103,7 +103,8 @@ class Image:
         # annotate the metadata DataFrame with the cell names
         self._annotated_metadata_df = annotate_metadata(
             cell_names_dict=subset_cells,
-            metadata_df=self._image_metadata,
+            #metadata_df=self._image_metadata,
+            metadata_df=self._metadata_df
             ann_col_name=ann_col_name
         )
         return self._annotated_metadata_df
