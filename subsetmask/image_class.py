@@ -93,7 +93,7 @@ class Image:
         )
 
         # get the cell names from the image coordinates and mask coordinates
-        subset_cells = get_cell_names(
+        self._subset_cells = get_cell_names(
             image_coords=self._image_coords,
             x_name=self._x_col,
             y_name=self._y_col,
@@ -102,7 +102,7 @@ class Image:
 
         # annotate the metadata DataFrame with the cell names
         self._annotated_metadata_df = annotate_metadata(
-            cell_names_dict=subset_cells,
+            cell_names_dict=self._subset_cells,
             #metadata_df=self._image_metadata,
             metadata_df=self._metadata_df,
             ann_col_name=ann_col_name
