@@ -66,6 +66,7 @@ annotated_meta.to_csv("test/metadata_with_labels.csv")
 ## Requirements
 
 * python==3.10
+* pyqt5==5.15.11
 * geopandas==1.1.0
 * imageio==2.37.0
 * matplotlib==3.10.3
