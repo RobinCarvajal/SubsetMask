@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "SubsetMask"
+type: software
+authors:
+  - family-names: "Carvajal-Quisilema"
+    given-names: "Robin J."
+doi: 10.5281/zenodo.18516798
+license: GPL-3.0-only
