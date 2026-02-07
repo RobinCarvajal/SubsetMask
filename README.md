@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18516798.svg)](https://doi.org/10.5281/zenodo.18516798)
+
 # SubsetMask
 
 **SubsetMask** is a lightweight toolkit designed to help researchers subset Spatially Resolved Transcriptomics (SRT) data objects—such as those from **CosMx** and **Xenium** platforms. It can be applied to any transcriptomics dataset that includes spatial coordinate metadata (`x`, `y`), making it broadly useful across SRT technologies.
